@@ -290,15 +290,34 @@ function DecisionScreen({ count, onAddMore, onFinish }: any) {
 function ResultScreen({ entries, onReset }: any) {
   const { txns, totalByPerson, ppl } = calcSettlement(entries);
   const grandTotal = Object.values(totalByPerson).reduce((a: number, b: any) => a + b, 0);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!cardRef.current) return;
+    setSaving(true);
+    try {
+      const html2canvas = (await import("https://esm.sh/html2canvas@1.4.1")).default;
+      const canvas = await html2canvas(cardRef.current, { backgroundColor: "#fff7ed", scale: 2 });
+      const link = document.createElement("a");
+      link.download = "정산결과.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (e) {
+      alert("저장 실패. 다시 시도해주세요.");
+    }
+    setSaving(false);
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "16px" }}>
-      <div style={{ marginBottom: 16 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: "#1e293b", margin: "0 0 2px" }}>정산 결과 🎉</h2>
-        <p style={{ color: "#94a3b8", fontSize: 12, margin: 0 }}>총 {(grandTotal as number).toLocaleString()}원</p>
-      </div>
 
-      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 14, paddingBottom: 12 }}>
+      <div ref={cardRef} style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 14, paddingBottom: 12 }}>
+        <div style={{ marginBottom: 4 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: "#1e293b", margin: "0 0 2px" }}>정산 결과 🎉</h2>
+          <p style={{ color: "#94a3b8", fontSize: 12, margin: 0 }}>총 {(grandTotal as number).toLocaleString()}원</p>
+        </div>
+
         <div style={{ padding: 16, background: "#fff7ed", borderRadius: 16 }}>
           <p style={{ margin: "0 0 12px", fontSize: 12, fontWeight: 700, color: "#f97316" }}>🍽 각자 먹은 금액</p>
           {ppl.map((p: string) => (
@@ -332,7 +351,13 @@ function ResultScreen({ entries, onReset }: any) {
         </div>
       </div>
 
-      <Btn onClick={onReset} ghost>처음으로 돌아가기</Btn>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, flexShrink: 0 }}>
+        <Btn onClick={handleSave} disabled={saving}>
+          {saving ? "저장 중..." : "이미지로 저장 📷"}
+        </Btn>
+        <Btn onClick={onReset} ghost>처음으로 돌아가기</Btn>
+      </div>
+
     </div>
   );
 }
