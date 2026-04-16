@@ -173,7 +173,7 @@ function UploadScreen({ onFile }: any) {
             </>
         }
       </div>
-      <input ref={ref} type="file" accept="image/*" capture="environment"
+      <input ref={ref} type="file" accept="image/*"
         onChange={e => { if (e.target.files?.[0]) handle(e.target.files[0]); }}
         style={{ display: "none" }} />
     </div>
