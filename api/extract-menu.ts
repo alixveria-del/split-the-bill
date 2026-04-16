@@ -29,9 +29,19 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+
+    if (!response.ok || data.error) {
+      return res.status(500).json({ error: data.error?.message || "API 오류" });
+    }
+
+    if (!data.content || !Array.isArray(data.content)) {
+      return res.status(500).json({ error: "응답 형식 오류" });
+    }
+
     const text = data.content.map(b => b.text || "").join("").replace(/```[\w]*\n?|```/g, "").trim();
     const items = JSON.parse(text);
     return res.status(200).json({ items });
+
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
