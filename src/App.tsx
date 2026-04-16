@@ -411,7 +411,7 @@ export default function App() {
     DECISION: "추가 여부", RESULT: "정산 결과",
   };
 
-  const cardH = step === STEP.HOME ? 520 : 600;
+  const cardH = step === STEP.HOME ? 520 : step === STEP.RESULT ? 700 : 600;
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #fff7ed, #fce7f3)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
